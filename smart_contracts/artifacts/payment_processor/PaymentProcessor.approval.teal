@@ -1,0 +1,407 @@
+#pragma version 10
+#pragma typetrack false
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.__algopy_entrypoint_with_init() -> uint64:
+main:
+    intcblock 0 1
+    bytecblock 0x151f7c75 "total_payments_processed" 0x80 "admin" "contract_paused" 0x00 "identity_registry_app_id"
+    txn ApplicationID
+    bnz main_after_if_else@2
+    // smart_contracts/payment_processor/contract.py:23-24
+    // # Initialize
+    // self.admin.value = Address(Global.creator_address)
+    bytec_3 // "admin"
+    global CreatorAddress
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:25
+    // self.identity_registry_app_id.value = UInt64(0)  # Will be set later
+    bytec 6 // "identity_registry_app_id"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:26
+    // self.total_payments_processed.value = UInt64(0)
+    bytec_1 // "total_payments_processed"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:27
+    // self.contract_paused.value = Bool(False)
+    bytec 4 // "contract_paused"
+    bytec 5 // 0x00
+    app_global_put
+
+main_after_if_else@2:
+    // smart_contracts/payment_processor/contract.py:5
+    // class PaymentProcessor(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@13
+    pushbytess 0x98aa549e 0x4d2361ca 0x9489d42a 0x4d3bbab0 0x9b1dc48b 0x6af78916 0x346b3dbc 0xc028726e // method "set_identity_registry(uint64)bool", method "process_payment(address,uint64,string)bool", method "get_total_payments()uint64", method "claim_reward(address,uint64)bool", method "pause_contract()bool", method "unpause_contract()bool", method "get_admin()address", method "get_registry_app_id()uint64"
+    txna ApplicationArgs 0
+    match main_set_identity_registry_route@5 main_process_payment_route@6 main_get_total_payments_route@7 main_claim_reward_route@8 main_pause_contract_route@9 main_unpause_contract_route@10 main_get_admin_route@11 main_get_registry_app_id_route@12
+
+main_after_if_else@15:
+    // smart_contracts/payment_processor/contract.py:5
+    // class PaymentProcessor(ARC4Contract):
+    intc_0 // 0
+    return
+
+main_get_registry_app_id_route@12:
+    // smart_contracts/payment_processor/contract.py:119
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_registry_app_id
+    itob
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_get_admin_route@11:
+    // smart_contracts/payment_processor/contract.py:114
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_admin
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_unpause_contract_route@10:
+    // smart_contracts/payment_processor/contract.py:107
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub unpause_contract
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_pause_contract_route@9:
+    // smart_contracts/payment_processor/contract.py:100
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub pause_contract
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_claim_reward_route@8:
+    // smart_contracts/payment_processor/contract.py:76
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/payment_processor/contract.py:5
+    // class PaymentProcessor(ARC4Contract):
+    txna ApplicationArgs 1
+    txna ApplicationArgs 2
+    btoi
+    // smart_contracts/payment_processor/contract.py:76
+    // @abimethod()
+    callsub claim_reward
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_get_total_payments_route@7:
+    // smart_contracts/payment_processor/contract.py:71
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_total_payments
+    itob
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_process_payment_route@6:
+    // smart_contracts/payment_processor/contract.py:36
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/payment_processor/contract.py:5
+    // class PaymentProcessor(ARC4Contract):
+    txna ApplicationArgs 1
+    txna ApplicationArgs 2
+    btoi
+    txna ApplicationArgs 3
+    extract 2 0
+    // smart_contracts/payment_processor/contract.py:36
+    // @abimethod()
+    callsub process_payment
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_set_identity_registry_route@5:
+    // smart_contracts/payment_processor/contract.py:29
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/payment_processor/contract.py:5
+    // class PaymentProcessor(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    // smart_contracts/payment_processor/contract.py:29
+    // @abimethod()
+    callsub set_identity_registry
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_bare_routing@13:
+    // smart_contracts/payment_processor/contract.py:5
+    // class PaymentProcessor(ARC4Contract):
+    txn OnCompletion
+    bnz main_after_if_else@15
+    txn ApplicationID
+    !
+    assert // can only call when creating
+    intc_1 // 1
+    return
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.set_identity_registry(registry_app_id: uint64) -> bytes:
+set_identity_registry:
+    // smart_contracts/payment_processor/contract.py:29-30
+    // @abimethod()
+    // def set_identity_registry(self, registry_app_id: UInt64) -> Bool:
+    proto 1 1
+    // smart_contracts/payment_processor/contract.py:32
+    // assert Txn.sender == self.admin.value, "Only admin"
+    intc_0 // 0
+    bytec_3 // "admin"
+    app_global_get_ex
+    assert // check self.admin exists
+    txn Sender
+    ==
+    assert // Only admin
+    // smart_contracts/payment_processor/contract.py:33
+    // self.identity_registry_app_id.value = registry_app_id
+    bytec 6 // "identity_registry_app_id"
+    frame_dig -1
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:34
+    // return Bool(True)
+    bytec_2 // 0x80
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.process_payment(recipient: bytes, amount: uint64, payment_type: bytes) -> bytes:
+process_payment:
+    // smart_contracts/payment_processor/contract.py:36-42
+    // @abimethod()
+    // def process_payment(
+    //     self,
+    //     recipient: Address,
+    //     amount: UInt64,
+    //     payment_type: String
+    // ) -> Bool:
+    proto 3 1
+    // smart_contracts/payment_processor/contract.py:54-55
+    // # Contract must not be paused
+    // assert not self.contract_paused.value, "Contract paused"
+    intc_0 // 0
+    bytec 4 // "contract_paused"
+    app_global_get_ex
+    assert // check self.contract_paused exists
+    bytec 5 // 0x00
+    ==
+    assert // Contract paused
+    // smart_contracts/payment_processor/contract.py:57-58
+    // # Basic validation
+    // assert amount > 0, "Amount must be positive"
+    frame_dig -2
+    assert // Amount must be positive
+    // smart_contracts/payment_processor/contract.py:59
+    // assert amount <= 1000000, "Amount too large (max 1 ALGO)"  # Safety limit
+    frame_dig -2
+    pushint 1000000 // 1000000
+    <=
+    assert // Amount too large (max 1 ALGO)
+    // smart_contracts/payment_processor/contract.py:65-66
+    // # Increment payment counter
+    // current_count = self.total_payments_processed.value
+    intc_0 // 0
+    bytec_1 // "total_payments_processed"
+    app_global_get_ex
+    assert // check self.total_payments_processed exists
+    // smart_contracts/payment_processor/contract.py:67
+    // self.total_payments_processed.value = current_count + 1
+    intc_1 // 1
+    +
+    bytec_1 // "total_payments_processed"
+    swap
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:69
+    // return Bool(True)
+    bytec_2 // 0x80
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.get_total_payments() -> uint64:
+get_total_payments:
+    // smart_contracts/payment_processor/contract.py:74
+    // return self.total_payments_processed.value
+    intc_0 // 0
+    bytec_1 // "total_payments_processed"
+    app_global_get_ex
+    assert // check self.total_payments_processed exists
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.claim_reward(claimer: bytes, reward_amount: uint64) -> bytes:
+claim_reward:
+    // smart_contracts/payment_processor/contract.py:76-77
+    // @abimethod()
+    // def claim_reward(self, claimer: Address, reward_amount: UInt64) -> Bool:
+    proto 2 1
+    // smart_contracts/payment_processor/contract.py:88
+    // assert not self.contract_paused.value, "Contract paused"
+    intc_0 // 0
+    bytec 4 // "contract_paused"
+    app_global_get_ex
+    assert // check self.contract_paused exists
+    bytec 5 // 0x00
+    ==
+    assert // Contract paused
+    // smart_contracts/payment_processor/contract.py:89
+    // assert reward_amount > 0, "Invalid amount"
+    frame_dig -1
+    assert // Invalid amount
+    // smart_contracts/payment_processor/contract.py:90
+    // assert reward_amount <= 500000, "Reward too large (max 0.5 ALGO)"
+    frame_dig -1
+    pushint 500000 // 500000
+    <=
+    assert // Reward too large (max 0.5 ALGO)
+    // smart_contracts/payment_processor/contract.py:95
+    // current_count = self.total_payments_processed.value
+    intc_0 // 0
+    bytec_1 // "total_payments_processed"
+    app_global_get_ex
+    assert // check self.total_payments_processed exists
+    // smart_contracts/payment_processor/contract.py:96
+    // self.total_payments_processed.value = current_count + 1
+    intc_1 // 1
+    +
+    bytec_1 // "total_payments_processed"
+    swap
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:98
+    // return Bool(True)
+    bytec_2 // 0x80
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.pause_contract() -> bytes:
+pause_contract:
+    // smart_contracts/payment_processor/contract.py:103
+    // assert Txn.sender == self.admin.value, "Only admin"
+    intc_0 // 0
+    bytec_3 // "admin"
+    app_global_get_ex
+    assert // check self.admin exists
+    txn Sender
+    ==
+    assert // Only admin
+    // smart_contracts/payment_processor/contract.py:104
+    // self.contract_paused.value = Bool(True)
+    bytec 4 // "contract_paused"
+    bytec_2 // 0x80
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:105
+    // return Bool(True)
+    bytec_2 // 0x80
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.unpause_contract() -> bytes:
+unpause_contract:
+    // smart_contracts/payment_processor/contract.py:110
+    // assert Txn.sender == self.admin.value, "Only admin"
+    intc_0 // 0
+    bytec_3 // "admin"
+    app_global_get_ex
+    assert // check self.admin exists
+    txn Sender
+    ==
+    assert // Only admin
+    // smart_contracts/payment_processor/contract.py:111
+    // self.contract_paused.value = Bool(False)
+    bytec 4 // "contract_paused"
+    bytec 5 // 0x00
+    app_global_put
+    // smart_contracts/payment_processor/contract.py:112
+    // return Bool(True)
+    bytec_2 // 0x80
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.get_admin() -> bytes:
+get_admin:
+    // smart_contracts/payment_processor/contract.py:117
+    // return self.admin.value
+    intc_0 // 0
+    bytec_3 // "admin"
+    app_global_get_ex
+    assert // check self.admin exists
+    retsub
+
+
+// smart_contracts.payment_processor.contract.PaymentProcessor.get_registry_app_id() -> uint64:
+get_registry_app_id:
+    // smart_contracts/payment_processor/contract.py:122
+    // return self.identity_registry_app_id.value
+    intc_0 // 0
+    bytec 6 // "identity_registry_app_id"
+    app_global_get_ex
+    assert // check self.identity_registry_app_id exists
+    retsub
