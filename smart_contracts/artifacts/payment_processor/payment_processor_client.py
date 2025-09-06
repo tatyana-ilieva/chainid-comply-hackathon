@@ -19,7 +19,7 @@ from algosdk.v2client.models import SimulateTraceConfig
 import algokit_utils
 from algokit_utils import AlgorandClient as _AlgoKitAlgorandClient
 
-_APP_SPEC_JSON = r"""{"arcs": [], "bareActions": {"call": [], "create": ["NoOp"]}, "methods": [{"actions": {"call": ["NoOp"], "create": []}, "args": [{"type": "uint64", "name": "registry_app_id"}], "name": "set_identity_registry", "returns": {"type": "bool"}, "desc": "Set the Identity Registry app ID (admin only)", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [{"type": "address", "desc": "Address to receive payment", "name": "recipient"}, {"type": "uint64", "desc": "Amount in microAlgos", "name": "amount"}, {"type": "string", "desc": "\"reward\", \"tip\", \"subscription\", etc.", "name": "payment_type"}], "name": "process_payment", "returns": {"type": "bool", "desc": "True if payment successful"}, "desc": "Process a micro-payment to verified user", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "get_total_payments", "returns": {"type": "uint64"}, "desc": "Get total number of payments processed", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [{"type": "address", "desc": "Address claiming reward", "name": "claimer"}, {"type": "uint64", "desc": "Amount to claim", "name": "reward_amount"}], "name": "claim_reward", "returns": {"type": "bool", "desc": "True if claim successful"}, "desc": "Claim a reward (simplified for MVP)", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "pause_contract", "returns": {"type": "bool"}, "desc": "Pause contract (admin only)", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "unpause_contract", "returns": {"type": "bool"}, "desc": "Unpause contract (admin only)", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "get_admin", "returns": {"type": "address"}, "desc": "Get admin address", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "get_registry_app_id", "returns": {"type": "uint64"}, "desc": "Get connected Identity Registry app ID", "events": []}], "name": "PaymentProcessor", "state": {"keys": {"box": {}, "global": {"admin": {"key": "YWRtaW4=", "keyType": "AVMString", "valueType": "AVMBytes"}, "contract_paused": {"key": "Y29udHJhY3RfcGF1c2Vk", "keyType": "AVMString", "valueType": "AVMBytes"}, "identity_registry_app_id": {"key": "aWRlbnRpdHlfcmVnaXN0cnlfYXBwX2lk", "keyType": "AVMString", "valueType": "AVMUint64"}, "total_payments_processed": {"key": "dG90YWxfcGF5bWVudHNfcHJvY2Vzc2Vk", "keyType": "AVMString", "valueType": "AVMUint64"}}, "local": {}}, "maps": {"box": {}, "global": {}, "local": {}}, "schema": {"global": {"bytes": 2, "ints": 2}, "local": {"bytes": 0, "ints": 0}}}, "structs": {}, "desc": "\n    ChainID+Comply Payment Processor Smart Contract\n    \n    Handles atomic micro-payments with compliance verification:\n    - Processes small payments/rewards\n    - Verifies user eligibility via Identity Registry\n    - Prevents double-spending\n    - Maintains payment audit trail\n    ", "source": {"approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBzbWFydF9jb250cmFjdHMucGF5bWVudF9wcm9jZXNzb3IuY29udHJhY3QuUGF5bWVudFByb2Nlc3Nvci5fX2FsZ29weV9lbnRyeXBvaW50X3dpdGhfaW5pdCgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIGludGNibG9jayAwIDEKICAgIGJ5dGVjYmxvY2sgMHgxNTFmN2M3NSAidG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkIiAweDgwICJhZG1pbiIgImNvbnRyYWN0X3BhdXNlZCIgMHgwMCAiaWRlbnRpdHlfcmVnaXN0cnlfYXBwX2lkIgogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGJueiBtYWluX2FmdGVyX2lmX2Vsc2VAMgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjIzLTI0CiAgICAvLyAjIEluaXRpYWxpemUKICAgIC8vIHNlbGYuYWRtaW4udmFsdWUgPSBBZGRyZXNzKEdsb2JhbC5jcmVhdG9yX2FkZHJlc3MpCiAgICBieXRlY18zIC8vICJhZG1pbiIKICAgIGdsb2JhbCBDcmVhdG9yQWRkcmVzcwogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToyNQogICAgLy8gc2VsZi5pZGVudGl0eV9yZWdpc3RyeV9hcHBfaWQudmFsdWUgPSBVSW50NjQoMCkgICMgV2lsbCBiZSBzZXQgbGF0ZXIKICAgIGJ5dGVjIDYgLy8gImlkZW50aXR5X3JlZ2lzdHJ5X2FwcF9pZCIKICAgIGludGNfMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjI2CiAgICAvLyBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZC52YWx1ZSA9IFVJbnQ2NCgwKQogICAgYnl0ZWNfMSAvLyAidG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkIgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MjcKICAgIC8vIHNlbGYuY29udHJhY3RfcGF1c2VkLnZhbHVlID0gQm9vbChGYWxzZSkKICAgIGJ5dGVjIDQgLy8gImNvbnRyYWN0X3BhdXNlZCIKICAgIGJ5dGVjIDUgLy8gMHgwMAogICAgYXBwX2dsb2JhbF9wdXQKCm1haW5fYWZ0ZXJfaWZfZWxzZUAyOgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIFBheW1lbnRQcm9jZXNzb3IoQVJDNENvbnRyYWN0KToKICAgIHR4biBOdW1BcHBBcmdzCiAgICBieiBtYWluX2JhcmVfcm91dGluZ0AxMwogICAgcHVzaGJ5dGVzcyAweDk4YWE1NDllIDB4NGQyMzYxY2EgMHg5NDg5ZDQyYSAweDRkM2JiYWIwIDB4OWIxZGM0OGIgMHg2YWY3ODkxNiAweDM0NmIzZGJjIDB4YzAyODcyNmUgLy8gbWV0aG9kICJzZXRfaWRlbnRpdHlfcmVnaXN0cnkodWludDY0KWJvb2wiLCBtZXRob2QgInByb2Nlc3NfcGF5bWVudChhZGRyZXNzLHVpbnQ2NCxzdHJpbmcpYm9vbCIsIG1ldGhvZCAiZ2V0X3RvdGFsX3BheW1lbnRzKCl1aW50NjQiLCBtZXRob2QgImNsYWltX3Jld2FyZChhZGRyZXNzLHVpbnQ2NClib29sIiwgbWV0aG9kICJwYXVzZV9jb250cmFjdCgpYm9vbCIsIG1ldGhvZCAidW5wYXVzZV9jb250cmFjdCgpYm9vbCIsIG1ldGhvZCAiZ2V0X2FkbWluKClhZGRyZXNzIiwgbWV0aG9kICJnZXRfcmVnaXN0cnlfYXBwX2lkKCl1aW50NjQiCiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAwCiAgICBtYXRjaCBtYWluX3NldF9pZGVudGl0eV9yZWdpc3RyeV9yb3V0ZUA1IG1haW5fcHJvY2Vzc19wYXltZW50X3JvdXRlQDYgbWFpbl9nZXRfdG90YWxfcGF5bWVudHNfcm91dGVANyBtYWluX2NsYWltX3Jld2FyZF9yb3V0ZUA4IG1haW5fcGF1c2VfY29udHJhY3Rfcm91dGVAOSBtYWluX3VucGF1c2VfY29udHJhY3Rfcm91dGVAMTAgbWFpbl9nZXRfYWRtaW5fcm91dGVAMTEgbWFpbl9nZXRfcmVnaXN0cnlfYXBwX2lkX3JvdXRlQDEyCgptYWluX2FmdGVyX2lmX2Vsc2VAMTU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgUGF5bWVudFByb2Nlc3NvcihBUkM0Q29udHJhY3QpOgogICAgaW50Y18wIC8vIDAKICAgIHJldHVybgoKbWFpbl9nZXRfcmVnaXN0cnlfYXBwX2lkX3JvdXRlQDEyOgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjExOQogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X3JlZ2lzdHJ5X2FwcF9pZAogICAgaXRvYgogICAgYnl0ZWNfMCAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKbWFpbl9nZXRfYWRtaW5fcm91dGVAMTE6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MTE0CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIG5vdCBjcmVhdGluZwogICAgY2FsbHN1YiBnZXRfYWRtaW4KICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fdW5wYXVzZV9jb250cmFjdF9yb3V0ZUAxMDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToxMDcKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIHVucGF1c2VfY29udHJhY3QKICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fcGF1c2VfY29udHJhY3Rfcm91dGVAOToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToxMDAKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIHBhdXNlX2NvbnRyYWN0CiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2NsYWltX3Jld2FyZF9yb3V0ZUA4OgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5Ojc2CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIG5vdCBjcmVhdGluZwogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIFBheW1lbnRQcm9jZXNzb3IoQVJDNENvbnRyYWN0KToKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDEKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDIKICAgIGJ0b2kKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo3NgogICAgLy8gQGFiaW1ldGhvZCgpCiAgICBjYWxsc3ViIGNsYWltX3Jld2FyZAogICAgYnl0ZWNfMCAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKbWFpbl9nZXRfdG90YWxfcGF5bWVudHNfcm91dGVANzoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo3MQogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X3RvdGFsX3BheW1lbnRzCiAgICBpdG9iCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX3Byb2Nlc3NfcGF5bWVudF9yb3V0ZUA2OgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjM2CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIG5vdCBjcmVhdGluZwogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIFBheW1lbnRQcm9jZXNzb3IoQVJDNENvbnRyYWN0KToKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDEKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDIKICAgIGJ0b2kKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDMKICAgIGV4dHJhY3QgMiAwCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MzYKICAgIC8vIEBhYmltZXRob2QoKQogICAgY2FsbHN1YiBwcm9jZXNzX3BheW1lbnQKICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fc2V0X2lkZW50aXR5X3JlZ2lzdHJ5X3JvdXRlQDU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MjkKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgUGF5bWVudFByb2Nlc3NvcihBUkM0Q29udHJhY3QpOgogICAgdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQogICAgYnRvaQogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjI5CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIGNhbGxzdWIgc2V0X2lkZW50aXR5X3JlZ2lzdHJ5CiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2JhcmVfcm91dGluZ0AxMzoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBQYXltZW50UHJvY2Vzc29yKEFSQzRDb250cmFjdCk6CiAgICB0eG4gT25Db21wbGV0aW9uCiAgICBibnogbWFpbl9hZnRlcl9pZl9lbHNlQDE1CiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgIQogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBjcmVhdGluZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5wYXltZW50X3Byb2Nlc3Nvci5jb250cmFjdC5QYXltZW50UHJvY2Vzc29yLnNldF9pZGVudGl0eV9yZWdpc3RyeShyZWdpc3RyeV9hcHBfaWQ6IHVpbnQ2NCkgLT4gYnl0ZXM6CnNldF9pZGVudGl0eV9yZWdpc3RyeToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToyOS0zMAogICAgLy8gQGFiaW1ldGhvZCgpCiAgICAvLyBkZWYgc2V0X2lkZW50aXR5X3JlZ2lzdHJ5KHNlbGYsIHJlZ2lzdHJ5X2FwcF9pZDogVUludDY0KSAtPiBCb29sOgogICAgcHJvdG8gMSAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MzIKICAgIC8vIGFzc2VydCBUeG4uc2VuZGVyID09IHNlbGYuYWRtaW4udmFsdWUsICJPbmx5IGFkbWluIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzMgLy8gImFkbWluIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFkbWluIGV4aXN0cwogICAgdHhuIFNlbmRlcgogICAgPT0KICAgIGFzc2VydCAvLyBPbmx5IGFkbWluCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MzMKICAgIC8vIHNlbGYuaWRlbnRpdHlfcmVnaXN0cnlfYXBwX2lkLnZhbHVlID0gcmVnaXN0cnlfYXBwX2lkCiAgICBieXRlYyA2IC8vICJpZGVudGl0eV9yZWdpc3RyeV9hcHBfaWQiCiAgICBmcmFtZV9kaWcgLTEKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MzQKICAgIC8vIHJldHVybiBCb29sKFRydWUpCiAgICBieXRlY18yIC8vIDB4ODAKICAgIHJldHN1YgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5wYXltZW50X3Byb2Nlc3Nvci5jb250cmFjdC5QYXltZW50UHJvY2Vzc29yLnByb2Nlc3NfcGF5bWVudChyZWNpcGllbnQ6IGJ5dGVzLCBhbW91bnQ6IHVpbnQ2NCwgcGF5bWVudF90eXBlOiBieXRlcykgLT4gYnl0ZXM6CnByb2Nlc3NfcGF5bWVudDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTozNi00MgogICAgLy8gQGFiaW1ldGhvZCgpCiAgICAvLyBkZWYgcHJvY2Vzc19wYXltZW50KAogICAgLy8gICAgIHNlbGYsCiAgICAvLyAgICAgcmVjaXBpZW50OiBBZGRyZXNzLAogICAgLy8gICAgIGFtb3VudDogVUludDY0LAogICAgLy8gICAgIHBheW1lbnRfdHlwZTogU3RyaW5nCiAgICAvLyApIC0+IEJvb2w6CiAgICBwcm90byAzIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo1NC01NQogICAgLy8gIyBDb250cmFjdCBtdXN0IG5vdCBiZSBwYXVzZWQKICAgIC8vIGFzc2VydCBub3Qgc2VsZi5jb250cmFjdF9wYXVzZWQudmFsdWUsICJDb250cmFjdCBwYXVzZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNCAvLyAiY29udHJhY3RfcGF1c2VkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmNvbnRyYWN0X3BhdXNlZCBleGlzdHMKICAgIGJ5dGVjIDUgLy8gMHgwMAogICAgPT0KICAgIGFzc2VydCAvLyBDb250cmFjdCBwYXVzZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo1Ny01OAogICAgLy8gIyBCYXNpYyB2YWxpZGF0aW9uCiAgICAvLyBhc3NlcnQgYW1vdW50ID4gMCwgIkFtb3VudCBtdXN0IGJlIHBvc2l0aXZlIgogICAgZnJhbWVfZGlnIC0yCiAgICBhc3NlcnQgLy8gQW1vdW50IG11c3QgYmUgcG9zaXRpdmUKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo1OQogICAgLy8gYXNzZXJ0IGFtb3VudCA8PSAxMDAwMDAwLCAiQW1vdW50IHRvbyBsYXJnZSAobWF4IDEgQUxHTykiICAjIFNhZmV0eSBsaW1pdAogICAgZnJhbWVfZGlnIC0yCiAgICBwdXNoaW50IDEwMDAwMDAgLy8gMTAwMDAwMAogICAgPD0KICAgIGFzc2VydCAvLyBBbW91bnQgdG9vIGxhcmdlIChtYXggMSBBTEdPKQogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjY1LTY2CiAgICAvLyAjIEluY3JlbWVudCBwYXltZW50IGNvdW50ZXIKICAgIC8vIGN1cnJlbnRfY291bnQgPSBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZC52YWx1ZQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzEgLy8gInRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi50b3RhbF9wYXltZW50c19wcm9jZXNzZWQgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6NjcKICAgIC8vIHNlbGYudG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkLnZhbHVlID0gY3VycmVudF9jb3VudCArIDEKICAgIGludGNfMSAvLyAxCiAgICArCiAgICBieXRlY18xIC8vICJ0b3RhbF9wYXltZW50c19wcm9jZXNzZWQiCiAgICBzd2FwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjY5CiAgICAvLyByZXR1cm4gQm9vbChUcnVlKQogICAgYnl0ZWNfMiAvLyAweDgwCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMucGF5bWVudF9wcm9jZXNzb3IuY29udHJhY3QuUGF5bWVudFByb2Nlc3Nvci5nZXRfdG90YWxfcGF5bWVudHMoKSAtPiB1aW50NjQ6CmdldF90b3RhbF9wYXltZW50czoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo3NAogICAgLy8gcmV0dXJuIHNlbGYudG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkLnZhbHVlCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMSAvLyAidG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZCBleGlzdHMKICAgIHJldHN1YgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5wYXltZW50X3Byb2Nlc3Nvci5jb250cmFjdC5QYXltZW50UHJvY2Vzc29yLmNsYWltX3Jld2FyZChjbGFpbWVyOiBieXRlcywgcmV3YXJkX2Ftb3VudDogdWludDY0KSAtPiBieXRlczoKY2xhaW1fcmV3YXJkOgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5Ojc2LTc3CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIC8vIGRlZiBjbGFpbV9yZXdhcmQoc2VsZiwgY2xhaW1lcjogQWRkcmVzcywgcmV3YXJkX2Ftb3VudDogVUludDY0KSAtPiBCb29sOgogICAgcHJvdG8gMiAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6ODgKICAgIC8vIGFzc2VydCBub3Qgc2VsZi5jb250cmFjdF9wYXVzZWQudmFsdWUsICJDb250cmFjdCBwYXVzZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNCAvLyAiY29udHJhY3RfcGF1c2VkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmNvbnRyYWN0X3BhdXNlZCBleGlzdHMKICAgIGJ5dGVjIDUgLy8gMHgwMAogICAgPT0KICAgIGFzc2VydCAvLyBDb250cmFjdCBwYXVzZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo4OQogICAgLy8gYXNzZXJ0IHJld2FyZF9hbW91bnQgPiAwLCAiSW52YWxpZCBhbW91bnQiCiAgICBmcmFtZV9kaWcgLTEKICAgIGFzc2VydCAvLyBJbnZhbGlkIGFtb3VudAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjkwCiAgICAvLyBhc3NlcnQgcmV3YXJkX2Ftb3VudCA8PSA1MDAwMDAsICJSZXdhcmQgdG9vIGxhcmdlIChtYXggMC41IEFMR08pIgogICAgZnJhbWVfZGlnIC0xCiAgICBwdXNoaW50IDUwMDAwMCAvLyA1MDAwMDAKICAgIDw9CiAgICBhc3NlcnQgLy8gUmV3YXJkIHRvbyBsYXJnZSAobWF4IDAuNSBBTEdPKQogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5Ojk1CiAgICAvLyBjdXJyZW50X2NvdW50ID0gc2VsZi50b3RhbF9wYXltZW50c19wcm9jZXNzZWQudmFsdWUKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18xIC8vICJ0b3RhbF9wYXltZW50c19wcm9jZXNzZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYudG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkIGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5Ojk2CiAgICAvLyBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZC52YWx1ZSA9IGN1cnJlbnRfY291bnQgKyAxCiAgICBpbnRjXzEgLy8gMQogICAgKwogICAgYnl0ZWNfMSAvLyAidG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkIgogICAgc3dhcAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo5OAogICAgLy8gcmV0dXJuIEJvb2woVHJ1ZSkKICAgIGJ5dGVjXzIgLy8gMHg4MAogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLnBheW1lbnRfcHJvY2Vzc29yLmNvbnRyYWN0LlBheW1lbnRQcm9jZXNzb3IucGF1c2VfY29udHJhY3QoKSAtPiBieXRlczoKcGF1c2VfY29udHJhY3Q6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MTAzCiAgICAvLyBhc3NlcnQgVHhuLnNlbmRlciA9PSBzZWxmLmFkbWluLnZhbHVlLCAiT25seSBhZG1pbiIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18zIC8vICJhZG1pbiIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hZG1pbiBleGlzdHMKICAgIHR4biBTZW5kZXIKICAgID09CiAgICBhc3NlcnQgLy8gT25seSBhZG1pbgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjEwNAogICAgLy8gc2VsZi5jb250cmFjdF9wYXVzZWQudmFsdWUgPSBCb29sKFRydWUpCiAgICBieXRlYyA0IC8vICJjb250cmFjdF9wYXVzZWQiCiAgICBieXRlY18yIC8vIDB4ODAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MTA1CiAgICAvLyByZXR1cm4gQm9vbChUcnVlKQogICAgYnl0ZWNfMiAvLyAweDgwCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMucGF5bWVudF9wcm9jZXNzb3IuY29udHJhY3QuUGF5bWVudFByb2Nlc3Nvci51bnBhdXNlX2NvbnRyYWN0KCkgLT4gYnl0ZXM6CnVucGF1c2VfY29udHJhY3Q6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MTEwCiAgICAvLyBhc3NlcnQgVHhuLnNlbmRlciA9PSBzZWxmLmFkbWluLnZhbHVlLCAiT25seSBhZG1pbiIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18zIC8vICJhZG1pbiIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hZG1pbiBleGlzdHMKICAgIHR4biBTZW5kZXIKICAgID09CiAgICBhc3NlcnQgLy8gT25seSBhZG1pbgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjExMQogICAgLy8gc2VsZi5jb250cmFjdF9wYXVzZWQudmFsdWUgPSBCb29sKEZhbHNlKQogICAgYnl0ZWMgNCAvLyAiY29udHJhY3RfcGF1c2VkIgogICAgYnl0ZWMgNSAvLyAweDAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjExMgogICAgLy8gcmV0dXJuIEJvb2woVHJ1ZSkKICAgIGJ5dGVjXzIgLy8gMHg4MAogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLnBheW1lbnRfcHJvY2Vzc29yLmNvbnRyYWN0LlBheW1lbnRQcm9jZXNzb3IuZ2V0X2FkbWluKCkgLT4gYnl0ZXM6CmdldF9hZG1pbjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToxMTcKICAgIC8vIHJldHVybiBzZWxmLmFkbWluLnZhbHVlCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMyAvLyAiYWRtaW4iCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYWRtaW4gZXhpc3RzCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMucGF5bWVudF9wcm9jZXNzb3IuY29udHJhY3QuUGF5bWVudFByb2Nlc3Nvci5nZXRfcmVnaXN0cnlfYXBwX2lkKCkgLT4gdWludDY0OgpnZXRfcmVnaXN0cnlfYXBwX2lkOgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjEyMgogICAgLy8gcmV0dXJuIHNlbGYuaWRlbnRpdHlfcmVnaXN0cnlfYXBwX2lkLnZhbHVlCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNiAvLyAiaWRlbnRpdHlfcmVnaXN0cnlfYXBwX2lkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmlkZW50aXR5X3JlZ2lzdHJ5X2FwcF9pZCBleGlzdHMKICAgIHJldHN1Ygo=", "clear": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"}}"""
+_APP_SPEC_JSON = r"""{"arcs": [], "bareActions": {"call": [], "create": ["NoOp"]}, "methods": [{"actions": {"call": ["NoOp"], "create": []}, "args": [{"type": "address", "name": "recipient"}, {"type": "uint64", "name": "amount"}], "name": "process_payment", "returns": {"type": "bool"}, "desc": "Process a payment", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "get_total_payments", "returns": {"type": "uint64"}, "desc": "Get total payments processed", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "get_admin", "returns": {"type": "address"}, "desc": "Get admin address", "events": []}, {"actions": {"call": ["NoOp"], "create": []}, "args": [], "name": "pause_contract", "returns": {"type": "bool"}, "desc": "Pause contract (admin only)", "events": []}], "name": "PaymentProcessor", "state": {"keys": {"box": {}, "global": {"admin": {"key": "YWRtaW4=", "keyType": "AVMString", "valueType": "AVMBytes"}, "contract_paused": {"key": "Y29udHJhY3RfcGF1c2Vk", "keyType": "AVMString", "valueType": "AVMBytes"}, "total_payments_processed": {"key": "dG90YWxfcGF5bWVudHNfcHJvY2Vzc2Vk", "keyType": "AVMString", "valueType": "AVMUint64"}}, "local": {}}, "maps": {"box": {}, "global": {}, "local": {}}, "schema": {"global": {"bytes": 2, "ints": 1}, "local": {"bytes": 0, "ints": 0}}}, "structs": {}, "desc": "Payment Processor for ChainID+Comply", "source": {"approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBzbWFydF9jb250cmFjdHMucGF5bWVudF9wcm9jZXNzb3IuY29udHJhY3QuUGF5bWVudFByb2Nlc3Nvci5fX2FsZ29weV9lbnRyeXBvaW50X3dpdGhfaW5pdCgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIGludGNibG9jayAwIDEKICAgIGJ5dGVjYmxvY2sgInRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZCIgMHgxNTFmN2M3NSAiYWRtaW4iICJjb250cmFjdF9wYXVzZWQiIDB4ODAKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBibnogbWFpbl9hZnRlcl9pZl9lbHNlQDIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToxMwogICAgLy8gc2VsZi5hZG1pbi52YWx1ZSA9IEFkZHJlc3MoR2xvYmFsLmNyZWF0b3JfYWRkcmVzcykKICAgIGJ5dGVjXzIgLy8gImFkbWluIgogICAgZ2xvYmFsIENyZWF0b3JBZGRyZXNzCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjE0CiAgICAvLyBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZC52YWx1ZSA9IFVJbnQ2NCgwKQogICAgYnl0ZWNfMCAvLyAidG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkIgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MTUKICAgIC8vIHNlbGYuY29udHJhY3RfcGF1c2VkLnZhbHVlID0gQm9vbChGYWxzZSkKICAgIGJ5dGVjXzMgLy8gImNvbnRyYWN0X3BhdXNlZCIKICAgIHB1c2hieXRlcyAweDAwCiAgICBhcHBfZ2xvYmFsX3B1dAoKbWFpbl9hZnRlcl9pZl9lbHNlQDI6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgUGF5bWVudFByb2Nlc3NvcihBUkM0Q29udHJhY3QpOgogICAgdHhuIE51bUFwcEFyZ3MKICAgIGJ6IG1haW5fYmFyZV9yb3V0aW5nQDkKICAgIHB1c2hieXRlc3MgMHg4ZmE0MzZiMyAweDk0ODlkNDJhIDB4MzQ2YjNkYmMgMHg5YjFkYzQ4YiAvLyBtZXRob2QgInByb2Nlc3NfcGF5bWVudChhZGRyZXNzLHVpbnQ2NClib29sIiwgbWV0aG9kICJnZXRfdG90YWxfcGF5bWVudHMoKXVpbnQ2NCIsIG1ldGhvZCAiZ2V0X2FkbWluKClhZGRyZXNzIiwgbWV0aG9kICJwYXVzZV9jb250cmFjdCgpYm9vbCIKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDAKICAgIG1hdGNoIG1haW5fcHJvY2Vzc19wYXltZW50X3JvdXRlQDUgbWFpbl9nZXRfdG90YWxfcGF5bWVudHNfcm91dGVANiBtYWluX2dldF9hZG1pbl9yb3V0ZUA3IG1haW5fcGF1c2VfY29udHJhY3Rfcm91dGVAOAoKbWFpbl9hZnRlcl9pZl9lbHNlQDExOgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIFBheW1lbnRQcm9jZXNzb3IoQVJDNENvbnRyYWN0KToKICAgIGludGNfMCAvLyAwCiAgICByZXR1cm4KCm1haW5fcGF1c2VfY29udHJhY3Rfcm91dGVAODoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTozOAogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgcGF1c2VfY29udHJhY3QKICAgIGJ5dGVjXzEgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fZ2V0X2FkbWluX3JvdXRlQDc6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MzMKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIGdldF9hZG1pbgogICAgYnl0ZWNfMSAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKbWFpbl9nZXRfdG90YWxfcGF5bWVudHNfcm91dGVANjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToyOAogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X3RvdGFsX3BheW1lbnRzCiAgICBpdG9iCiAgICBieXRlY18xIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX3Byb2Nlc3NfcGF5bWVudF9yb3V0ZUA1OgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjE3CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIG5vdCBjcmVhdGluZwogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIFBheW1lbnRQcm9jZXNzb3IoQVJDNENvbnRyYWN0KToKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDEKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDIKICAgIGJ0b2kKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToxNwogICAgLy8gQGFiaW1ldGhvZCgpCiAgICBjYWxsc3ViIHByb2Nlc3NfcGF5bWVudAogICAgYnl0ZWNfMSAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKbWFpbl9iYXJlX3JvdXRpbmdAOToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBQYXltZW50UHJvY2Vzc29yKEFSQzRDb250cmFjdCk6CiAgICB0eG4gT25Db21wbGV0aW9uCiAgICBibnogbWFpbl9hZnRlcl9pZl9lbHNlQDExCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgIQogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBjcmVhdGluZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5wYXltZW50X3Byb2Nlc3Nvci5jb250cmFjdC5QYXltZW50UHJvY2Vzc29yLnByb2Nlc3NfcGF5bWVudChyZWNpcGllbnQ6IGJ5dGVzLCBhbW91bnQ6IHVpbnQ2NCkgLT4gYnl0ZXM6CnByb2Nlc3NfcGF5bWVudDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToxNy0xOAogICAgLy8gQGFiaW1ldGhvZCgpCiAgICAvLyBkZWYgcHJvY2Vzc19wYXltZW50KHNlbGYsIHJlY2lwaWVudDogQWRkcmVzcywgYW1vdW50OiBVSW50NjQpIC0+IEJvb2w6CiAgICBwcm90byAyIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9wYXltZW50X3Byb2Nlc3Nvci9jb250cmFjdC5weToyMAogICAgLy8gYXNzZXJ0IG5vdCBzZWxmLmNvbnRyYWN0X3BhdXNlZC52YWx1ZSwgIkNvbnRyYWN0IHBhdXNlZCIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18zIC8vICJjb250cmFjdF9wYXVzZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY29udHJhY3RfcGF1c2VkIGV4aXN0cwogICAgcHVzaGJ5dGVzIDB4MDAKICAgID09CiAgICBhc3NlcnQgLy8gQ29udHJhY3QgcGF1c2VkCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MjEKICAgIC8vIGFzc2VydCBhbW91bnQgPiAwIGFuZCBhbW91bnQgPD0gMTAwMDAwMCwgIkludmFsaWQgYW1vdW50IgogICAgZnJhbWVfZGlnIC0xCiAgICBieiBwcm9jZXNzX3BheW1lbnRfYm9vbF9mYWxzZUAzCiAgICBmcmFtZV9kaWcgLTEKICAgIHB1c2hpbnQgMTAwMDAwMCAvLyAxMDAwMDAwCiAgICA8PQogICAgYnogcHJvY2Vzc19wYXltZW50X2Jvb2xfZmFsc2VAMwogICAgaW50Y18xIC8vIDEKCnByb2Nlc3NfcGF5bWVudF9ib29sX21lcmdlQDQ6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MjEKICAgIC8vIGFzc2VydCBhbW91bnQgPiAwIGFuZCBhbW91bnQgPD0gMTAwMDAwMCwgIkludmFsaWQgYW1vdW50IgogICAgYXNzZXJ0IC8vIEludmFsaWQgYW1vdW50CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MjMKICAgIC8vIGN1cnJlbnRfY291bnQgPSBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZC52YWx1ZQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzAgLy8gInRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi50b3RhbF9wYXltZW50c19wcm9jZXNzZWQgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MjQKICAgIC8vIHNlbGYudG90YWxfcGF5bWVudHNfcHJvY2Vzc2VkLnZhbHVlID0gY3VycmVudF9jb3VudCArIDEKICAgIGludGNfMSAvLyAxCiAgICArCiAgICBieXRlY18wIC8vICJ0b3RhbF9wYXltZW50c19wcm9jZXNzZWQiCiAgICBzd2FwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjI2CiAgICAvLyByZXR1cm4gQm9vbChUcnVlKQogICAgYnl0ZWMgNCAvLyAweDgwCiAgICByZXRzdWIKCnByb2Nlc3NfcGF5bWVudF9ib29sX2ZhbHNlQDM6CiAgICBpbnRjXzAgLy8gMAogICAgYiBwcm9jZXNzX3BheW1lbnRfYm9vbF9tZXJnZUA0CgoKLy8gc21hcnRfY29udHJhY3RzLnBheW1lbnRfcHJvY2Vzc29yLmNvbnRyYWN0LlBheW1lbnRQcm9jZXNzb3IuZ2V0X3RvdGFsX3BheW1lbnRzKCkgLT4gdWludDY0OgpnZXRfdG90YWxfcGF5bWVudHM6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6MzEKICAgIC8vIHJldHVybiBzZWxmLnRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZC52YWx1ZQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzAgLy8gInRvdGFsX3BheW1lbnRzX3Byb2Nlc3NlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi50b3RhbF9wYXltZW50c19wcm9jZXNzZWQgZXhpc3RzCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMucGF5bWVudF9wcm9jZXNzb3IuY29udHJhY3QuUGF5bWVudFByb2Nlc3Nvci5nZXRfYWRtaW4oKSAtPiBieXRlczoKZ2V0X2FkbWluOgogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjM2CiAgICAvLyByZXR1cm4gc2VsZi5hZG1pbi52YWx1ZQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzIgLy8gImFkbWluIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFkbWluIGV4aXN0cwogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLnBheW1lbnRfcHJvY2Vzc29yLmNvbnRyYWN0LlBheW1lbnRQcm9jZXNzb3IucGF1c2VfY29udHJhY3QoKSAtPiBieXRlczoKcGF1c2VfY29udHJhY3Q6CiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6NDEKICAgIC8vIGFzc2VydCBUeG4uc2VuZGVyID09IHNlbGYuYWRtaW4udmFsdWUsICJPbmx5IGFkbWluIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzIgLy8gImFkbWluIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFkbWluIGV4aXN0cwogICAgdHhuIFNlbmRlcgogICAgPT0KICAgIGFzc2VydCAvLyBPbmx5IGFkbWluCiAgICAvLyBzbWFydF9jb250cmFjdHMvcGF5bWVudF9wcm9jZXNzb3IvY29udHJhY3QucHk6NDIKICAgIC8vIHNlbGYuY29udHJhY3RfcGF1c2VkLnZhbHVlID0gQm9vbChUcnVlKQogICAgYnl0ZWNfMyAvLyAiY29udHJhY3RfcGF1c2VkIgogICAgYnl0ZWMgNCAvLyAweDgwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL3BheW1lbnRfcHJvY2Vzc29yL2NvbnRyYWN0LnB5OjQzCiAgICAvLyByZXR1cm4gQm9vbChUcnVlKQogICAgYnl0ZWMgNCAvLyAweDgwCiAgICByZXRzdWIK", "clear": "I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"}}"""
 APP_SPEC = algokit_utils.Arc56Contract.from_json(_APP_SPEC_JSON)
 
 def _parse_abi_args(args: object | None = None) -> list[object] | None:
@@ -65,63 +65,30 @@ def _init_dataclass(cls: type, data: dict) -> object:
     return cls(**field_values)
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
-class SetIdentityRegistryArgs:
-    """Dataclass for set_identity_registry arguments"""
-    registry_app_id: int
-
-    @property
-    def abi_method_signature(self) -> str:
-        return "set_identity_registry(uint64)bool"
-
-@dataclasses.dataclass(frozen=True, kw_only=True)
 class ProcessPaymentArgs:
     """Dataclass for process_payment arguments"""
     recipient: str
     amount: int
-    payment_type: str
 
     @property
     def abi_method_signature(self) -> str:
-        return "process_payment(address,uint64,string)bool"
-
-@dataclasses.dataclass(frozen=True, kw_only=True)
-class ClaimRewardArgs:
-    """Dataclass for claim_reward arguments"""
-    claimer: str
-    reward_amount: int
-
-    @property
-    def abi_method_signature(self) -> str:
-        return "claim_reward(address,uint64)bool"
+        return "process_payment(address,uint64)bool"
 
 
 class PaymentProcessorParams:
     def __init__(self, app_client: algokit_utils.AppClient):
         self.app_client = app_client
 
-    def set_identity_registry(
-        self,
-        args: tuple[int] | SetIdentityRegistryArgs,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.AppCallMethodCallParams:
-        method_args = _parse_abi_args(args)
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.params.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "set_identity_registry(uint64)bool",
-            "args": method_args,
-        }))
-
     def process_payment(
         self,
-        args: tuple[str, int, str] | ProcessPaymentArgs,
+        args: tuple[str, int] | ProcessPaymentArgs,
         params: algokit_utils.CommonAppCallParams | None = None
     ) -> algokit_utils.AppCallMethodCallParams:
         method_args = _parse_abi_args(args)
         params = params or algokit_utils.CommonAppCallParams()
         return self.app_client.params.call(algokit_utils.AppClientMethodCallParams(**{
             **dataclasses.asdict(params),
-            "method": "process_payment(address,uint64,string)bool",
+            "method": "process_payment(address,uint64)bool",
             "args": method_args,
         }))
 
@@ -136,41 +103,6 @@ class PaymentProcessorParams:
             "method": "get_total_payments()uint64",
         }))
 
-    def claim_reward(
-        self,
-        args: tuple[str, int] | ClaimRewardArgs,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.AppCallMethodCallParams:
-        method_args = _parse_abi_args(args)
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.params.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "claim_reward(address,uint64)bool",
-            "args": method_args,
-        }))
-
-    def pause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.AppCallMethodCallParams:
-    
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.params.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "pause_contract()bool",
-        }))
-
-    def unpause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.AppCallMethodCallParams:
-    
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.params.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "unpause_contract()bool",
-        }))
-
     def get_admin(
         self,
         params: algokit_utils.CommonAppCallParams | None = None
@@ -182,7 +114,7 @@ class PaymentProcessorParams:
             "method": "get_admin()address",
         }))
 
-    def get_registry_app_id(
+    def pause_contract(
         self,
         params: algokit_utils.CommonAppCallParams | None = None
     ) -> algokit_utils.AppCallMethodCallParams:
@@ -190,7 +122,7 @@ class PaymentProcessorParams:
         params = params or algokit_utils.CommonAppCallParams()
         return self.app_client.params.call(algokit_utils.AppClientMethodCallParams(**{
             **dataclasses.asdict(params),
-            "method": "get_registry_app_id()uint64",
+            "method": "pause_contract()bool",
         }))
 
     def clear_state(
@@ -208,29 +140,16 @@ class PaymentProcessorCreateTransactionParams:
     def __init__(self, app_client: algokit_utils.AppClient):
         self.app_client = app_client
 
-    def set_identity_registry(
-        self,
-        args: tuple[int] | SetIdentityRegistryArgs,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.BuiltTransactions:
-        method_args = _parse_abi_args(args)
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.create_transaction.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "set_identity_registry(uint64)bool",
-            "args": method_args,
-        }))
-
     def process_payment(
         self,
-        args: tuple[str, int, str] | ProcessPaymentArgs,
+        args: tuple[str, int] | ProcessPaymentArgs,
         params: algokit_utils.CommonAppCallParams | None = None
     ) -> algokit_utils.BuiltTransactions:
         method_args = _parse_abi_args(args)
         params = params or algokit_utils.CommonAppCallParams()
         return self.app_client.create_transaction.call(algokit_utils.AppClientMethodCallParams(**{
             **dataclasses.asdict(params),
-            "method": "process_payment(address,uint64,string)bool",
+            "method": "process_payment(address,uint64)bool",
             "args": method_args,
         }))
 
@@ -245,41 +164,6 @@ class PaymentProcessorCreateTransactionParams:
             "method": "get_total_payments()uint64",
         }))
 
-    def claim_reward(
-        self,
-        args: tuple[str, int] | ClaimRewardArgs,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.BuiltTransactions:
-        method_args = _parse_abi_args(args)
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.create_transaction.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "claim_reward(address,uint64)bool",
-            "args": method_args,
-        }))
-
-    def pause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.BuiltTransactions:
-    
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.create_transaction.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "pause_contract()bool",
-        }))
-
-    def unpause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> algokit_utils.BuiltTransactions:
-    
-        params = params or algokit_utils.CommonAppCallParams()
-        return self.app_client.create_transaction.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "unpause_contract()bool",
-        }))
-
     def get_admin(
         self,
         params: algokit_utils.CommonAppCallParams | None = None
@@ -291,7 +175,7 @@ class PaymentProcessorCreateTransactionParams:
             "method": "get_admin()address",
         }))
 
-    def get_registry_app_id(
+    def pause_contract(
         self,
         params: algokit_utils.CommonAppCallParams | None = None
     ) -> algokit_utils.BuiltTransactions:
@@ -299,7 +183,7 @@ class PaymentProcessorCreateTransactionParams:
         params = params or algokit_utils.CommonAppCallParams()
         return self.app_client.create_transaction.call(algokit_utils.AppClientMethodCallParams(**{
             **dataclasses.asdict(params),
-            "method": "get_registry_app_id()uint64",
+            "method": "pause_contract()bool",
         }))
 
     def clear_state(
@@ -317,25 +201,9 @@ class PaymentProcessorSend:
     def __init__(self, app_client: algokit_utils.AppClient):
         self.app_client = app_client
 
-    def set_identity_registry(
-        self,
-        args: tuple[int] | SetIdentityRegistryArgs,
-        params: algokit_utils.CommonAppCallParams | None = None,
-        send_params: algokit_utils.SendParams | None = None
-    ) -> algokit_utils.SendAppTransactionResult[bool]:
-        method_args = _parse_abi_args(args)
-        params = params or algokit_utils.CommonAppCallParams()
-        response = self.app_client.send.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "set_identity_registry(uint64)bool",
-            "args": method_args,
-        }), send_params=send_params)
-        parsed_response = response
-        return typing.cast(algokit_utils.SendAppTransactionResult[bool], parsed_response)
-
     def process_payment(
         self,
-        args: tuple[str, int, str] | ProcessPaymentArgs,
+        args: tuple[str, int] | ProcessPaymentArgs,
         params: algokit_utils.CommonAppCallParams | None = None,
         send_params: algokit_utils.SendParams | None = None
     ) -> algokit_utils.SendAppTransactionResult[bool]:
@@ -343,7 +211,7 @@ class PaymentProcessorSend:
         params = params or algokit_utils.CommonAppCallParams()
         response = self.app_client.send.call(algokit_utils.AppClientMethodCallParams(**{
             **dataclasses.asdict(params),
-            "method": "process_payment(address,uint64,string)bool",
+            "method": "process_payment(address,uint64)bool",
             "args": method_args,
         }), send_params=send_params)
         parsed_response = response
@@ -363,50 +231,6 @@ class PaymentProcessorSend:
         parsed_response = response
         return typing.cast(algokit_utils.SendAppTransactionResult[int], parsed_response)
 
-    def claim_reward(
-        self,
-        args: tuple[str, int] | ClaimRewardArgs,
-        params: algokit_utils.CommonAppCallParams | None = None,
-        send_params: algokit_utils.SendParams | None = None
-    ) -> algokit_utils.SendAppTransactionResult[bool]:
-        method_args = _parse_abi_args(args)
-        params = params or algokit_utils.CommonAppCallParams()
-        response = self.app_client.send.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "claim_reward(address,uint64)bool",
-            "args": method_args,
-        }), send_params=send_params)
-        parsed_response = response
-        return typing.cast(algokit_utils.SendAppTransactionResult[bool], parsed_response)
-
-    def pause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None,
-        send_params: algokit_utils.SendParams | None = None
-    ) -> algokit_utils.SendAppTransactionResult[bool]:
-    
-        params = params or algokit_utils.CommonAppCallParams()
-        response = self.app_client.send.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "pause_contract()bool",
-        }), send_params=send_params)
-        parsed_response = response
-        return typing.cast(algokit_utils.SendAppTransactionResult[bool], parsed_response)
-
-    def unpause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None,
-        send_params: algokit_utils.SendParams | None = None
-    ) -> algokit_utils.SendAppTransactionResult[bool]:
-    
-        params = params or algokit_utils.CommonAppCallParams()
-        response = self.app_client.send.call(algokit_utils.AppClientMethodCallParams(**{
-            **dataclasses.asdict(params),
-            "method": "unpause_contract()bool",
-        }), send_params=send_params)
-        parsed_response = response
-        return typing.cast(algokit_utils.SendAppTransactionResult[bool], parsed_response)
-
     def get_admin(
         self,
         params: algokit_utils.CommonAppCallParams | None = None,
@@ -421,19 +245,19 @@ class PaymentProcessorSend:
         parsed_response = response
         return typing.cast(algokit_utils.SendAppTransactionResult[str], parsed_response)
 
-    def get_registry_app_id(
+    def pause_contract(
         self,
         params: algokit_utils.CommonAppCallParams | None = None,
         send_params: algokit_utils.SendParams | None = None
-    ) -> algokit_utils.SendAppTransactionResult[int]:
+    ) -> algokit_utils.SendAppTransactionResult[bool]:
     
         params = params or algokit_utils.CommonAppCallParams()
         response = self.app_client.send.call(algokit_utils.AppClientMethodCallParams(**{
             **dataclasses.asdict(params),
-            "method": "get_registry_app_id()uint64",
+            "method": "pause_contract()bool",
         }), send_params=send_params)
         parsed_response = response
-        return typing.cast(algokit_utils.SendAppTransactionResult[int], parsed_response)
+        return typing.cast(algokit_utils.SendAppTransactionResult[bool], parsed_response)
 
     def clear_state(
         self,
@@ -450,7 +274,6 @@ class GlobalStateValue(typing.TypedDict):
     """Shape of global_state state key values"""
     admin: bytes
     contract_paused: bytes
-    identity_registry_app_id: int
     total_payments_processed: int
 
 class PaymentProcessorState:
@@ -504,14 +327,6 @@ class _GlobalState:
         if isinstance(value, dict) and "AVMBytes" in self._struct_classes:
             return _init_dataclass(self._struct_classes["AVMBytes"], value)  # type: ignore
         return typing.cast(bytes, value)
-
-    @property
-    def identity_registry_app_id(self) -> int:
-        """Get the current value of the identity_registry_app_id key in global_state state"""
-        value = self.app_client.state.global_state.get_value("identity_registry_app_id")
-        if isinstance(value, dict) and "AVMUint64" in self._struct_classes:
-            return _init_dataclass(self._struct_classes["AVMUint64"], value)  # type: ignore
-        return typing.cast(int, value)
 
     @property
     def total_payments_processed(self) -> int:
@@ -667,13 +482,7 @@ class PaymentProcessorClient:
     @typing.overload
     def decode_return_value(
         self,
-        method: typing.Literal["set_identity_registry(uint64)bool"],
-        return_value: algokit_utils.ABIReturn | None
-    ) -> bool | None: ...
-    @typing.overload
-    def decode_return_value(
-        self,
-        method: typing.Literal["process_payment(address,uint64,string)bool"],
+        method: typing.Literal["process_payment(address,uint64)bool"],
         return_value: algokit_utils.ABIReturn | None
     ) -> bool | None: ...
     @typing.overload
@@ -685,33 +494,15 @@ class PaymentProcessorClient:
     @typing.overload
     def decode_return_value(
         self,
-        method: typing.Literal["claim_reward(address,uint64)bool"],
-        return_value: algokit_utils.ABIReturn | None
-    ) -> bool | None: ...
-    @typing.overload
-    def decode_return_value(
-        self,
-        method: typing.Literal["pause_contract()bool"],
-        return_value: algokit_utils.ABIReturn | None
-    ) -> bool | None: ...
-    @typing.overload
-    def decode_return_value(
-        self,
-        method: typing.Literal["unpause_contract()bool"],
-        return_value: algokit_utils.ABIReturn | None
-    ) -> bool | None: ...
-    @typing.overload
-    def decode_return_value(
-        self,
         method: typing.Literal["get_admin()address"],
         return_value: algokit_utils.ABIReturn | None
     ) -> str | None: ...
     @typing.overload
     def decode_return_value(
         self,
-        method: typing.Literal["get_registry_app_id()uint64"],
+        method: typing.Literal["pause_contract()bool"],
         return_value: algokit_utils.ABIReturn | None
-    ) -> int | None: ...
+    ) -> bool | None: ...
     @typing.overload
     def decode_return_value(
         self,
@@ -894,40 +685,20 @@ class PaymentProcessorFactoryCreateParams:
             algokit_utils.AppFactoryCreateParams(**dataclasses.asdict(params)),
             compilation_params=compilation_params)
 
-    def set_identity_registry(
-        self,
-        args: tuple[int] | SetIdentityRegistryArgs,
-        *,
-        params: algokit_utils.CommonAppCallCreateParams | None = None,
-        compilation_params: algokit_utils.AppClientCompilationParams | None = None
-    ) -> algokit_utils.AppCreateMethodCallParams:
-        """Creates a new instance using the set_identity_registry(uint64)bool ABI method"""
-        params = params or algokit_utils.CommonAppCallCreateParams()
-        return self.app_factory.params.create(
-            algokit_utils.AppFactoryCreateMethodCallParams(
-                **{
-                **dataclasses.asdict(params),
-                "method": "set_identity_registry(uint64)bool",
-                "args": _parse_abi_args(args),
-                }
-            ),
-            compilation_params=compilation_params
-        )
-
     def process_payment(
         self,
-        args: tuple[str, int, str] | ProcessPaymentArgs,
+        args: tuple[str, int] | ProcessPaymentArgs,
         *,
         params: algokit_utils.CommonAppCallCreateParams | None = None,
         compilation_params: algokit_utils.AppClientCompilationParams | None = None
     ) -> algokit_utils.AppCreateMethodCallParams:
-        """Creates a new instance using the process_payment(address,uint64,string)bool ABI method"""
+        """Creates a new instance using the process_payment(address,uint64)bool ABI method"""
         params = params or algokit_utils.CommonAppCallCreateParams()
         return self.app_factory.params.create(
             algokit_utils.AppFactoryCreateMethodCallParams(
                 **{
                 **dataclasses.asdict(params),
-                "method": "process_payment(address,uint64,string)bool",
+                "method": "process_payment(address,uint64)bool",
                 "args": _parse_abi_args(args),
                 }
             ),
@@ -953,64 +724,6 @@ class PaymentProcessorFactoryCreateParams:
             compilation_params=compilation_params
         )
 
-    def claim_reward(
-        self,
-        args: tuple[str, int] | ClaimRewardArgs,
-        *,
-        params: algokit_utils.CommonAppCallCreateParams | None = None,
-        compilation_params: algokit_utils.AppClientCompilationParams | None = None
-    ) -> algokit_utils.AppCreateMethodCallParams:
-        """Creates a new instance using the claim_reward(address,uint64)bool ABI method"""
-        params = params or algokit_utils.CommonAppCallCreateParams()
-        return self.app_factory.params.create(
-            algokit_utils.AppFactoryCreateMethodCallParams(
-                **{
-                **dataclasses.asdict(params),
-                "method": "claim_reward(address,uint64)bool",
-                "args": _parse_abi_args(args),
-                }
-            ),
-            compilation_params=compilation_params
-        )
-
-    def pause_contract(
-        self,
-        *,
-        params: algokit_utils.CommonAppCallCreateParams | None = None,
-        compilation_params: algokit_utils.AppClientCompilationParams | None = None
-    ) -> algokit_utils.AppCreateMethodCallParams:
-        """Creates a new instance using the pause_contract()bool ABI method"""
-        params = params or algokit_utils.CommonAppCallCreateParams()
-        return self.app_factory.params.create(
-            algokit_utils.AppFactoryCreateMethodCallParams(
-                **{
-                **dataclasses.asdict(params),
-                "method": "pause_contract()bool",
-                "args": None,
-                }
-            ),
-            compilation_params=compilation_params
-        )
-
-    def unpause_contract(
-        self,
-        *,
-        params: algokit_utils.CommonAppCallCreateParams | None = None,
-        compilation_params: algokit_utils.AppClientCompilationParams | None = None
-    ) -> algokit_utils.AppCreateMethodCallParams:
-        """Creates a new instance using the unpause_contract()bool ABI method"""
-        params = params or algokit_utils.CommonAppCallCreateParams()
-        return self.app_factory.params.create(
-            algokit_utils.AppFactoryCreateMethodCallParams(
-                **{
-                **dataclasses.asdict(params),
-                "method": "unpause_contract()bool",
-                "args": None,
-                }
-            ),
-            compilation_params=compilation_params
-        )
-
     def get_admin(
         self,
         *,
@@ -1030,19 +743,19 @@ class PaymentProcessorFactoryCreateParams:
             compilation_params=compilation_params
         )
 
-    def get_registry_app_id(
+    def pause_contract(
         self,
         *,
         params: algokit_utils.CommonAppCallCreateParams | None = None,
         compilation_params: algokit_utils.AppClientCompilationParams | None = None
     ) -> algokit_utils.AppCreateMethodCallParams:
-        """Creates a new instance using the get_registry_app_id()uint64 ABI method"""
+        """Creates a new instance using the pause_contract()bool ABI method"""
         params = params or algokit_utils.CommonAppCallCreateParams()
         return self.app_factory.params.create(
             algokit_utils.AppFactoryCreateMethodCallParams(
                 **{
                 **dataclasses.asdict(params),
-                "method": "get_registry_app_id()uint64",
+                "method": "pause_contract()bool",
                 "args": None,
                 }
             ),
@@ -1150,27 +863,9 @@ class PaymentProcessorComposer:
         self._composer = client.algorand.new_group()
         self._result_mappers: list[typing.Callable[[algokit_utils.ABIReturn | None], object] | None] = []
 
-    def set_identity_registry(
-        self,
-        args: tuple[int] | SetIdentityRegistryArgs,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> "PaymentProcessorComposer":
-        self._composer.add_app_call_method_call(
-            self.client.params.set_identity_registry(
-                args=args,
-                params=params,
-            )
-        )
-        self._result_mappers.append(
-            lambda v: self.client.decode_return_value(
-                "set_identity_registry(uint64)bool", v
-            )
-        )
-        return self
-
     def process_payment(
         self,
-        args: tuple[str, int, str] | ProcessPaymentArgs,
+        args: tuple[str, int] | ProcessPaymentArgs,
         params: algokit_utils.CommonAppCallParams | None = None
     ) -> "PaymentProcessorComposer":
         self._composer.add_app_call_method_call(
@@ -1181,7 +876,7 @@ class PaymentProcessorComposer:
         )
         self._result_mappers.append(
             lambda v: self.client.decode_return_value(
-                "process_payment(address,uint64,string)bool", v
+                "process_payment(address,uint64)bool", v
             )
         )
         return self
@@ -1203,58 +898,6 @@ class PaymentProcessorComposer:
         )
         return self
 
-    def claim_reward(
-        self,
-        args: tuple[str, int] | ClaimRewardArgs,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> "PaymentProcessorComposer":
-        self._composer.add_app_call_method_call(
-            self.client.params.claim_reward(
-                args=args,
-                params=params,
-            )
-        )
-        self._result_mappers.append(
-            lambda v: self.client.decode_return_value(
-                "claim_reward(address,uint64)bool", v
-            )
-        )
-        return self
-
-    def pause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> "PaymentProcessorComposer":
-        self._composer.add_app_call_method_call(
-            self.client.params.pause_contract(
-                
-                params=params,
-            )
-        )
-        self._result_mappers.append(
-            lambda v: self.client.decode_return_value(
-                "pause_contract()bool", v
-            )
-        )
-        return self
-
-    def unpause_contract(
-        self,
-        params: algokit_utils.CommonAppCallParams | None = None
-    ) -> "PaymentProcessorComposer":
-        self._composer.add_app_call_method_call(
-            self.client.params.unpause_contract(
-                
-                params=params,
-            )
-        )
-        self._result_mappers.append(
-            lambda v: self.client.decode_return_value(
-                "unpause_contract()bool", v
-            )
-        )
-        return self
-
     def get_admin(
         self,
         params: algokit_utils.CommonAppCallParams | None = None
@@ -1272,19 +915,19 @@ class PaymentProcessorComposer:
         )
         return self
 
-    def get_registry_app_id(
+    def pause_contract(
         self,
         params: algokit_utils.CommonAppCallParams | None = None
     ) -> "PaymentProcessorComposer":
         self._composer.add_app_call_method_call(
-            self.client.params.get_registry_app_id(
+            self.client.params.pause_contract(
                 
                 params=params,
             )
         )
         self._result_mappers.append(
             lambda v: self.client.decode_return_value(
-                "get_registry_app_id()uint64", v
+                "pause_contract()bool", v
             )
         )
         return self

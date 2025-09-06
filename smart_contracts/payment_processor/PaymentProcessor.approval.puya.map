@@ -1,0 +1,1065 @@
+{
+  "version": 3,
+  "sources": [
+    "contract.py"
+  ],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAYQ;AAA2B;;AAA3B;AACA;AAAsC;AAAtC;AACA;AAA6B;;;AAA7B;AAVR;;AAAA;;;AAAA;;;;;;;;;;;;;;;;;;;;;;AAAA;;;AAAA;;;;;;;;;;AAAA;;AAiCK;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;;AALA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;;AALA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAXA;;AAAA;AAAA;AAAA;;AAAA;AAZL;;;AAAA;;;AAAA;AAYK;;;AAAA;AAAA;AAAA;AAAA;AAAA;;AAZL;;AAAA;;;;;;;;;AAYA;;;AAGmB;AAAA;AAAA;AAAA;AAAJ;;;AAAA;AAAP;AACO;;AAAA;;;AAAe;;AAAU;;;;AAAV;AAAf;;;;AAAP;AAEgB;AAAA;AAAA;AAAA;AACsC;AAAhB;AAAtC;AAAA;AAAA;AAEO;;AAAP;;;;;AAKO;AAAA;AAAA;AAAA;AAAP;AAKO;AAAA;AAAA;AAAA;AAAP;AAKqB;AAAA;AAAA;AAAA;AAAd;;AAAA;AAAP;AACA;AAA6B;;AAA7B;AACO;;AAAP",
+  "op_pc_offset": 0,
+  "pc_events": {
+    "1": {
+      "subroutine": "smart_contracts.payment_processor.contract.PaymentProcessor.__algopy_entrypoint_with_init",
+      "params": {},
+      "block": "main",
+      "stack_in": [],
+      "op": "intcblock 0 1"
+    },
+    "5": {
+      "op": "bytecblock \"total_payments_processed\" 0x151f7c75 \"admin\" \"contract_paused\" 0x80"
+    },
+    "61": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "63": {
+      "op": "bnz main_after_if_else@2",
+      "stack_out": []
+    },
+    "66": {
+      "op": "bytec_2 // \"admin\"",
+      "defined_out": [
+        "\"admin\""
+      ],
+      "stack_out": [
+        "\"admin\""
+      ]
+    },
+    "67": {
+      "op": "global CreatorAddress",
+      "defined_out": [
+        "\"admin\"",
+        "materialized_values%0#0"
+      ],
+      "stack_out": [
+        "\"admin\"",
+        "materialized_values%0#0"
+      ]
+    },
+    "69": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "70": {
+      "op": "bytec_0 // \"total_payments_processed\"",
+      "defined_out": [
+        "\"total_payments_processed\""
+      ],
+      "stack_out": [
+        "\"total_payments_processed\""
+      ]
+    },
+    "71": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "\"total_payments_processed\"",
+        "0"
+      ],
+      "stack_out": [
+        "\"total_payments_processed\"",
+        "0"
+      ]
+    },
+    "72": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "73": {
+      "op": "bytec_3 // \"contract_paused\"",
+      "defined_out": [
+        "\"contract_paused\""
+      ],
+      "stack_out": [
+        "\"contract_paused\""
+      ]
+    },
+    "74": {
+      "op": "pushbytes 0x00",
+      "defined_out": [
+        "\"contract_paused\"",
+        "0x00"
+      ],
+      "stack_out": [
+        "\"contract_paused\"",
+        "0x00"
+      ]
+    },
+    "77": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "78": {
+      "block": "main_after_if_else@2",
+      "stack_in": [],
+      "op": "txn NumAppArgs",
+      "defined_out": [
+        "tmp%0#2"
+      ],
+      "stack_out": [
+        "tmp%0#2"
+      ]
+    },
+    "80": {
+      "op": "bz main_bare_routing@9",
+      "stack_out": []
+    },
+    "83": {
+      "op": "pushbytess 0x8fa436b3 0x9489d42a 0x346b3dbc 0x9b1dc48b // method \"process_payment(address,uint64)bool\", method \"get_total_payments()uint64\", method \"get_admin()address\", method \"pause_contract()bool\"",
+      "defined_out": [
+        "Method(get_admin()address)",
+        "Method(get_total_payments()uint64)",
+        "Method(pause_contract()bool)",
+        "Method(process_payment(address,uint64)bool)"
+      ],
+      "stack_out": [
+        "Method(process_payment(address,uint64)bool)",
+        "Method(get_total_payments()uint64)",
+        "Method(get_admin()address)",
+        "Method(pause_contract()bool)"
+      ]
+    },
+    "105": {
+      "op": "txna ApplicationArgs 0",
+      "defined_out": [
+        "Method(get_admin()address)",
+        "Method(get_total_payments()uint64)",
+        "Method(pause_contract()bool)",
+        "Method(process_payment(address,uint64)bool)",
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "Method(process_payment(address,uint64)bool)",
+        "Method(get_total_payments()uint64)",
+        "Method(get_admin()address)",
+        "Method(pause_contract()bool)",
+        "tmp%2#0"
+      ]
+    },
+    "108": {
+      "op": "match main_process_payment_route@5 main_get_total_payments_route@6 main_get_admin_route@7 main_pause_contract_route@8",
+      "stack_out": []
+    },
+    "118": {
+      "block": "main_after_if_else@11",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "119": {
+      "op": "return",
+      "stack_out": []
+    },
+    "120": {
+      "block": "main_pause_contract_route@8",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%21#0"
+      ],
+      "stack_out": [
+        "tmp%21#0"
+      ]
+    },
+    "122": {
+      "op": "!",
+      "defined_out": [
+        "tmp%22#0"
+      ],
+      "stack_out": [
+        "tmp%22#0"
+      ]
+    },
+    "123": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "124": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%23#0"
+      ],
+      "stack_out": [
+        "tmp%23#0"
+      ]
+    },
+    "126": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "127": {
+      "callsub": "smart_contracts.payment_processor.contract.PaymentProcessor.pause_contract",
+      "op": "callsub pause_contract",
+      "defined_out": [
+        "tmp%25#0"
+      ],
+      "stack_out": [
+        "tmp%25#0"
+      ]
+    },
+    "130": {
+      "op": "bytec_1 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "tmp%25#0"
+      ],
+      "stack_out": [
+        "tmp%25#0",
+        "0x151f7c75"
+      ]
+    },
+    "131": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "tmp%25#0"
+      ]
+    },
+    "132": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%26#0"
+      ],
+      "stack_out": [
+        "tmp%26#0"
+      ]
+    },
+    "133": {
+      "op": "log",
+      "stack_out": []
+    },
+    "134": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "135": {
+      "op": "return",
+      "stack_out": []
+    },
+    "136": {
+      "block": "main_get_admin_route@7",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%15#0"
+      ],
+      "stack_out": [
+        "tmp%15#0"
+      ]
+    },
+    "138": {
+      "op": "!",
+      "defined_out": [
+        "tmp%16#0"
+      ],
+      "stack_out": [
+        "tmp%16#0"
+      ]
+    },
+    "139": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "140": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%17#0"
+      ],
+      "stack_out": [
+        "tmp%17#0"
+      ]
+    },
+    "142": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "143": {
+      "callsub": "smart_contracts.payment_processor.contract.PaymentProcessor.get_admin",
+      "op": "callsub get_admin",
+      "defined_out": [
+        "tmp%19#0"
+      ],
+      "stack_out": [
+        "tmp%19#0"
+      ]
+    },
+    "146": {
+      "op": "bytec_1 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "tmp%19#0"
+      ],
+      "stack_out": [
+        "tmp%19#0",
+        "0x151f7c75"
+      ]
+    },
+    "147": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "tmp%19#0"
+      ]
+    },
+    "148": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%20#0"
+      ],
+      "stack_out": [
+        "tmp%20#0"
+      ]
+    },
+    "149": {
+      "op": "log",
+      "stack_out": []
+    },
+    "150": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "151": {
+      "op": "return",
+      "stack_out": []
+    },
+    "152": {
+      "block": "main_get_total_payments_route@6",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%10#0"
+      ],
+      "stack_out": [
+        "tmp%10#0"
+      ]
+    },
+    "154": {
+      "op": "!",
+      "defined_out": [
+        "tmp%11#0"
+      ],
+      "stack_out": [
+        "tmp%11#0"
+      ]
+    },
+    "155": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "156": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%12#0"
+      ],
+      "stack_out": [
+        "tmp%12#0"
+      ]
+    },
+    "158": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "159": {
+      "callsub": "smart_contracts.payment_processor.contract.PaymentProcessor.get_total_payments",
+      "op": "callsub get_total_payments",
+      "defined_out": [
+        "to_encode%0#0"
+      ],
+      "stack_out": [
+        "to_encode%0#0"
+      ]
+    },
+    "162": {
+      "op": "itob",
+      "defined_out": [
+        "val_as_bytes%0#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%0#0"
+      ]
+    },
+    "163": {
+      "op": "bytec_1 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "val_as_bytes%0#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%0#0",
+        "0x151f7c75"
+      ]
+    },
+    "164": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "val_as_bytes%0#0"
+      ]
+    },
+    "165": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%14#0"
+      ],
+      "stack_out": [
+        "tmp%14#0"
+      ]
+    },
+    "166": {
+      "op": "log",
+      "stack_out": []
+    },
+    "167": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "168": {
+      "op": "return",
+      "stack_out": []
+    },
+    "169": {
+      "block": "main_process_payment_route@5",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%3#0"
+      ],
+      "stack_out": [
+        "tmp%3#0"
+      ]
+    },
+    "171": {
+      "op": "!",
+      "defined_out": [
+        "tmp%4#0"
+      ],
+      "stack_out": [
+        "tmp%4#0"
+      ]
+    },
+    "172": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "173": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%5#0"
+      ],
+      "stack_out": [
+        "tmp%5#0"
+      ]
+    },
+    "175": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "176": {
+      "op": "txna ApplicationArgs 1",
+      "defined_out": [
+        "reinterpret_bytes[32]%0#0"
+      ],
+      "stack_out": [
+        "reinterpret_bytes[32]%0#0"
+      ]
+    },
+    "179": {
+      "op": "txna ApplicationArgs 2",
+      "defined_out": [
+        "reinterpret_bytes[32]%0#0",
+        "reinterpret_bytes[8]%0#0"
+      ],
+      "stack_out": [
+        "reinterpret_bytes[32]%0#0",
+        "reinterpret_bytes[8]%0#0"
+      ]
+    },
+    "182": {
+      "op": "btoi",
+      "defined_out": [
+        "reinterpret_bytes[32]%0#0",
+        "tmp%7#0"
+      ],
+      "stack_out": [
+        "reinterpret_bytes[32]%0#0",
+        "tmp%7#0"
+      ]
+    },
+    "183": {
+      "callsub": "smart_contracts.payment_processor.contract.PaymentProcessor.process_payment",
+      "op": "callsub process_payment",
+      "defined_out": [
+        "tmp%8#0"
+      ],
+      "stack_out": [
+        "tmp%8#0"
+      ]
+    },
+    "186": {
+      "op": "bytec_1 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "tmp%8#0"
+      ],
+      "stack_out": [
+        "tmp%8#0",
+        "0x151f7c75"
+      ]
+    },
+    "187": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "tmp%8#0"
+      ]
+    },
+    "188": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%9#0"
+      ],
+      "stack_out": [
+        "tmp%9#0"
+      ]
+    },
+    "189": {
+      "op": "log",
+      "stack_out": []
+    },
+    "190": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "191": {
+      "op": "return",
+      "stack_out": []
+    },
+    "192": {
+      "block": "main_bare_routing@9",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%27#0"
+      ],
+      "stack_out": [
+        "tmp%27#0"
+      ]
+    },
+    "194": {
+      "op": "bnz main_after_if_else@11",
+      "stack_out": []
+    },
+    "197": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%28#0"
+      ],
+      "stack_out": [
+        "tmp%28#0"
+      ]
+    },
+    "199": {
+      "op": "!",
+      "defined_out": [
+        "tmp%29#0"
+      ],
+      "stack_out": [
+        "tmp%29#0"
+      ]
+    },
+    "200": {
+      "error": "can only call when creating",
+      "op": "assert // can only call when creating",
+      "stack_out": []
+    },
+    "201": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "202": {
+      "op": "return",
+      "stack_out": []
+    },
+    "203": {
+      "subroutine": "smart_contracts.payment_processor.contract.PaymentProcessor.process_payment",
+      "params": {
+        "recipient#0": "bytes",
+        "amount#0": "uint64"
+      },
+      "block": "process_payment",
+      "stack_in": [],
+      "op": "proto 2 1"
+    },
+    "206": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "207": {
+      "op": "bytec_3 // \"contract_paused\"",
+      "defined_out": [
+        "\"contract_paused\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"contract_paused\""
+      ]
+    },
+    "208": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "209": {
+      "error": "check self.contract_paused exists",
+      "op": "assert // check self.contract_paused exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "210": {
+      "op": "pushbytes 0x00",
+      "defined_out": [
+        "0x00",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "0x00"
+      ]
+    },
+    "213": {
+      "op": "==",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "214": {
+      "error": "Contract paused",
+      "op": "assert // Contract paused",
+      "stack_out": []
+    },
+    "215": {
+      "op": "frame_dig -1",
+      "defined_out": [
+        "amount#0 (copy)"
+      ],
+      "stack_out": [
+        "amount#0 (copy)"
+      ]
+    },
+    "217": {
+      "op": "bz process_payment_bool_false@3",
+      "stack_out": []
+    },
+    "220": {
+      "op": "frame_dig -1",
+      "stack_out": [
+        "amount#0 (copy)"
+      ]
+    },
+    "222": {
+      "op": "pushint 1000000 // 1000000",
+      "defined_out": [
+        "1000000",
+        "amount#0 (copy)"
+      ],
+      "stack_out": [
+        "amount#0 (copy)",
+        "1000000"
+      ]
+    },
+    "226": {
+      "op": "<=",
+      "defined_out": [
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "tmp%2#0"
+      ]
+    },
+    "227": {
+      "op": "bz process_payment_bool_false@3",
+      "stack_out": []
+    },
+    "230": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "and_result%0#0"
+      ],
+      "stack_out": [
+        "and_result%0#0"
+      ]
+    },
+    "231": {
+      "block": "process_payment_bool_merge@4",
+      "stack_in": [
+        "and_result%0#0"
+      ],
+      "error": "Invalid amount",
+      "op": "assert // Invalid amount",
+      "defined_out": [],
+      "stack_out": []
+    },
+    "232": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "233": {
+      "op": "bytec_0 // \"total_payments_processed\"",
+      "defined_out": [
+        "\"total_payments_processed\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"total_payments_processed\""
+      ]
+    },
+    "234": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "current_count#0",
+        "maybe_exists%1#0"
+      ],
+      "stack_out": [
+        "current_count#0",
+        "maybe_exists%1#0"
+      ]
+    },
+    "235": {
+      "error": "check self.total_payments_processed exists",
+      "op": "assert // check self.total_payments_processed exists",
+      "stack_out": [
+        "current_count#0"
+      ]
+    },
+    "236": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1",
+        "current_count#0"
+      ],
+      "stack_out": [
+        "current_count#0",
+        "1"
+      ]
+    },
+    "237": {
+      "op": "+",
+      "defined_out": [
+        "materialized_values%0#0"
+      ],
+      "stack_out": [
+        "materialized_values%0#0"
+      ]
+    },
+    "238": {
+      "op": "bytec_0 // \"total_payments_processed\"",
+      "stack_out": [
+        "materialized_values%0#0",
+        "\"total_payments_processed\""
+      ]
+    },
+    "239": {
+      "op": "swap",
+      "stack_out": [
+        "\"total_payments_processed\"",
+        "materialized_values%0#0"
+      ]
+    },
+    "240": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "241": {
+      "op": "bytec 4 // 0x80",
+      "defined_out": [
+        "0x80"
+      ],
+      "stack_out": [
+        "0x80"
+      ]
+    },
+    "243": {
+      "retsub": true,
+      "op": "retsub"
+    },
+    "244": {
+      "block": "process_payment_bool_false@3",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "and_result%0#0"
+      ],
+      "stack_out": [
+        "and_result%0#0"
+      ]
+    },
+    "245": {
+      "op": "b process_payment_bool_merge@4"
+    },
+    "248": {
+      "subroutine": "smart_contracts.payment_processor.contract.PaymentProcessor.get_total_payments",
+      "params": {},
+      "block": "get_total_payments",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "249": {
+      "op": "bytec_0 // \"total_payments_processed\"",
+      "defined_out": [
+        "\"total_payments_processed\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"total_payments_processed\""
+      ]
+    },
+    "250": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "251": {
+      "error": "check self.total_payments_processed exists",
+      "op": "assert // check self.total_payments_processed exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "252": {
+      "retsub": true,
+      "op": "retsub"
+    },
+    "253": {
+      "subroutine": "smart_contracts.payment_processor.contract.PaymentProcessor.get_admin",
+      "params": {},
+      "block": "get_admin",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "254": {
+      "op": "bytec_2 // \"admin\"",
+      "defined_out": [
+        "\"admin\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"admin\""
+      ]
+    },
+    "255": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "256": {
+      "error": "check self.admin exists",
+      "op": "assert // check self.admin exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "257": {
+      "retsub": true,
+      "op": "retsub"
+    },
+    "258": {
+      "subroutine": "smart_contracts.payment_processor.contract.PaymentProcessor.pause_contract",
+      "params": {},
+      "block": "pause_contract",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "259": {
+      "op": "bytec_2 // \"admin\"",
+      "defined_out": [
+        "\"admin\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"admin\""
+      ]
+    },
+    "260": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "261": {
+      "error": "check self.admin exists",
+      "op": "assert // check self.admin exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "262": {
+      "op": "txn Sender",
+      "defined_out": [
+        "maybe_value%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "tmp%0#0"
+      ]
+    },
+    "264": {
+      "op": "==",
+      "defined_out": [
+        "tmp%1#0"
+      ],
+      "stack_out": [
+        "tmp%1#0"
+      ]
+    },
+    "265": {
+      "error": "Only admin",
+      "op": "assert // Only admin",
+      "stack_out": []
+    },
+    "266": {
+      "op": "bytec_3 // \"contract_paused\"",
+      "defined_out": [
+        "\"contract_paused\""
+      ],
+      "stack_out": [
+        "\"contract_paused\""
+      ]
+    },
+    "267": {
+      "op": "bytec 4 // 0x80",
+      "defined_out": [
+        "\"contract_paused\"",
+        "0x80"
+      ],
+      "stack_out": [
+        "\"contract_paused\"",
+        "0x80"
+      ]
+    },
+    "269": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "270": {
+      "op": "bytec 4 // 0x80",
+      "stack_out": [
+        "0x80"
+      ]
+    },
+    "272": {
+      "retsub": true,
+      "op": "retsub"
+    }
+  }
+}
