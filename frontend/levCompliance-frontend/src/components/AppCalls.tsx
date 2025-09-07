@@ -3,6 +3,7 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { IdentityRegistryClient } from '../contracts/IdentityRegistryClient'
+import { PaymentProcessorClient } from '../contracts/PaymentProcessorClient'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
 interface AppCallsInterface {
@@ -71,13 +72,35 @@ const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
     setLoading(false)
   }
 
+  const claimReward = async (platform: string, amount: number) => {
+    setLoading(true)
+    try {
+      const paymentClient = new PaymentProcessorClient({
+        algorand,
+        appId: 1024,
+        defaultSender: activeAddress!,
+      })
+
+      // Real ALGO transfer via Payment Processor
+      const response = await paymentClient.send.processPayment({
+        args: [activeAddress!, amount * 1000000], // Convert ALGO to microALGOs
+      })
+
+      enqueueSnackbar(`${amount} ALGO reward claimed from ${platform}! TX: ${response.txIds[0]}`, { variant: 'success' })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      enqueueSnackbar(`Claim failed: ${errorMessage}`, { variant: 'error' })
+    }
+    setLoading(false)
+  }
+
   return (
     <dialog id="appcalls_modal" className={`modal ${openModal ? 'modal-open' : ''} bg-slate-200`}>
       <form method="dialog" className="modal-box max-w-2xl">
         <h3 className="font-bold text-xl text-center mb-4">ChainID+Comply Identity Management</h3>
 
         <div className="alert alert-success mb-4">
-          <span>Connected to REAL Identity Registry (App ID {contractStats.appId}) on Algorand LocalNet</span>
+          <span>Connected to REAL contracts - Identity Registry (App 1002) & Payment Processor (App 1024)</span>
         </div>
 
         <div className="space-y-4">
@@ -93,8 +116,22 @@ const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
             </div>
           </div>
 
+          <div className="divider">Cross-Platform Rewards (Real ALGO Transfers)</div>
+
+          <div className="grid grid-cols-1 gap-2">
+            <button className="btn btn-outline btn-sm" onClick={() => claimReward('DAO Governance', 0.1)} disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-xs" /> : 'Claim DAO Reward (0.1 ALGO)'}
+            </button>
+            <button className="btn btn-outline btn-sm" onClick={() => claimReward('DeFi Protocol', 0.05)} disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-xs" /> : 'Claim DeFi Reward (0.05 ALGO)'}
+            </button>
+            <button className="btn btn-outline btn-sm" onClick={() => claimReward('NFT Marketplace', 0.02)} disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-xs" /> : 'Claim NFT Reward (0.02 ALGO)'}
+            </button>
+          </div>
+
           <div className="alert alert-info">
-            <span>This connects to your deployed smart contract and shows real blockchain state.</span>
+            <span>These buttons make REAL ALGO transfers using your Payment Processor smart contract.</span>
           </div>
         </div>
 
