@@ -1,15 +1,29 @@
+import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useWallet } from '@txnlab/use-wallet-react'
+import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import AppCalls from './components/AppCalls'
 import ConnectWallet from './components/ConnectWallet'
+import { PaymentProcessorClient } from './contracts/PaymentProcessorClient'
+import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
   const [appCallsDemoModal, setAppCallsDemoModal] = useState<boolean>(false)
-  const [selectedPlatform, setSelectedPlatform] = useState<string>('')
-  const { activeAddress } = useWallet()
+  const [loading, setLoading] = useState<boolean>(false)
+  const { activeAddress, transactionSigner } = useWallet()
+  const { enqueueSnackbar } = useSnackbar()
+
+  // Payment functionality setup
+  const algodConfig = getAlgodConfigFromViteEnvironment()
+  const indexerConfig = getIndexerConfigFromViteEnvironment()
+  const algorand = AlgorandClient.fromConfig({
+    algodConfig,
+    indexerConfig,
+  })
+  algorand.setDefaultSigner(transactionSigner)
 
   const toggleWalletModal = () => {
     setOpenWalletModal(!openWalletModal)
@@ -19,25 +33,49 @@ const Home: React.FC<HomeProps> = () => {
     setAppCallsDemoModal(!appCallsDemoModal)
   }
 
+  const claimPlatformReward = async (platformName: string, rewardString: string) => {
+    setLoading(true)
+    try {
+      // Extract amount from reward string (e.g., "0.5 ALGO" -> 0.5)
+      const amount = parseFloat(rewardString.split(' ')[0])
+
+      const paymentClient = new PaymentProcessorClient({
+        algorand,
+        appId: 1024,
+        defaultSender: activeAddress!,
+      })
+
+      const response = await paymentClient.send.processPayment({
+        args: [activeAddress!, amount * 1000000], // Convert to microALGOs
+      })
+
+      enqueueSnackbar(`${amount} ALGO claimed from ${platformName}! TX: ${response.txIds[0]}`, { variant: 'success' })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      enqueueSnackbar(`Claim failed: ${errorMessage}`, { variant: 'error' })
+    }
+    setLoading(false)
+  }
+
   const platforms = [
     {
       name: 'AlgoDAO Governance',
       description: 'Participate in DAO voting and governance decisions',
-      reward: '0.5 ALGO voting reward',
+      reward: '0.1 ALGO voting reward',
       icon: '🏛️',
       verified: activeAddress ? true : false,
     },
     {
       name: 'AlgoFi DeFi Protocol',
       description: 'Lend, borrow, and earn yield on crypto assets',
-      reward: '0.3 ALGO liquidity bonus',
+      reward: '0.05 ALGO liquidity bonus',
       icon: '💰',
       verified: activeAddress ? true : false,
     },
     {
       name: 'NFT Marketplace',
       description: 'Buy, sell, and trade verified NFT collections',
-      reward: '0.2 ALGO creator reward',
+      reward: '0.02 ALGO creator reward',
       icon: '🎨',
       verified: activeAddress ? true : false,
     },
@@ -102,7 +140,9 @@ const Home: React.FC<HomeProps> = () => {
               {/* Cross-Platform Integration */}
               <div className="mb-8">
                 <h2 className="text-2xl font-bold mb-4">Cross-Platform Access</h2>
-                <p className="text-gray-600 mb-6">Your verified identity can be used across multiple platforms without re-doing KYC</p>
+                <p className="text-gray-600 mb-6">
+                  Your verified identity enables reward claims across multiple platforms with real ALGO transfers
+                </p>
 
                 <div className="grid md:grid-cols-3 gap-6">
                   {platforms.map((platform, index) => (
@@ -116,8 +156,12 @@ const Home: React.FC<HomeProps> = () => {
                           <div className="mt-4">
                             <div className="badge badge-success mb-2">✓ Identity Verified via ChainID+Comply</div>
                             <div className="text-green-600 font-semibold">Eligible: {platform.reward}</div>
-                            <button className="btn btn-sm btn-primary mt-2 w-full" onClick={() => setSelectedPlatform(platform.name)}>
-                              Claim Reward
+                            <button
+                              className="btn btn-sm btn-primary mt-2 w-full"
+                              onClick={() => claimPlatformReward(platform.name, platform.reward)}
+                              disabled={loading}
+                            >
+                              {loading ? <span className="loading loading-spinner loading-xs" /> : 'Claim Reward'}
                             </button>
                           </div>
                         ) : (
@@ -143,8 +187,8 @@ const Home: React.FC<HomeProps> = () => {
                     <p className="text-green-600">Enhanced KYC Complete</p>
                   </div>
                   <div className="bg-white p-4 rounded">
-                    <h4 className="font-semibold">Platforms Using Identity</h4>
-                    <p className="text-blue-600">3 Connected</p>
+                    <h4 className="font-semibold">Real Blockchain Integration</h4>
+                    <p className="text-blue-600">Live on Algorand LocalNet</p>
                   </div>
                 </div>
               </div>
@@ -153,7 +197,9 @@ const Home: React.FC<HomeProps> = () => {
 
           {/* Footer */}
           <div className="text-center mt-8 pt-6 border-t">
-            <p className="text-gray-500">Built for Algorand x EasyA Hackathon 2025 | Privacy-preserving • Cross-platform • Compliant</p>
+            <p className="text-gray-500">
+              Built for Algorand x EasyA Hackathon 2025 | Privacy-preserving • Cross-platform • Real ALGO transfers
+            </p>
           </div>
         </div>
       </div>
